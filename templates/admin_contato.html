@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Contato</title>
+</head>
+<body class="p-8">
+<a href="{{ url_for('admin_dashboard') }}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400 mb-4 inline-block">Voltar ao Dashboard</a>
+<form method="POST" class="space-y-4">
+<input name="whatsapp" placeholder="Número WhatsApp" required class="border p-2 rounded w-full" value="{{ contato['whatsapp'] }}">
+<button class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Salvar Contato</button>
+</form>
+</body>
+</html>

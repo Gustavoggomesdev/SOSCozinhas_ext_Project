@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+<title>Hero Admin</title>
+<style>
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+</style>
+</head>
+<body class="p-8">
+
+<a href="{{ url_for('admin_dashboard') }}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400 mb-4 inline-block">Voltar ao Dashboard</a>
+
+<h2 class="text-xl font-bold mb-4">Adicionar Novo Banner</h2>
+<form method="POST" enctype="multipart/form-data" class="space-y-4 mb-8">
+<input name="titulo" placeholder="Título" required class="border p-2 rounded w-full">
+<input name="descricao1" placeholder="Descrição 1" class="border p-2 rounded w-full">
+<input name="descricao2" placeholder="Descrição 2" class="border p-2 rounded w-full">
+<input type="file" name="imagem" class="border p-2 rounded w-full">
+<button class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Salvar Banner</button>
+</form>
+
+<h2 class="text-xl font-bold mb-4">Preview Carrossel</h2>
+{% if hero_banners %}
+<div class="relative">
+<div class="swiper mySwiperPreview h-[70vh] md:h-[50vh]">
+  <div class="swiper-wrapper">
+    {% for h in hero_banners %}
+    <div class="swiper-slide relative">
+      {% if h['imagem'] %}
+      <img src="{{ url_for('static', filename=h['imagem']) }}" class="w-full h-full object-cover">
+      {% endif %}
+      <div class="hero-text max-w-2xl space-y-2">
+        <h3 class="text-3xl md:text-2xl font-bold">{{ h['titulo'] }}</h3>
+        <p class="text-lg md:text-base">{{ h['descricao1'] }}</p>
+        <p class="text-base md:text-sm">{{ h['descricao2'] }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-pagination"></div>
+</div>
+</div>
+{% else %}
+<p class="text-gray-500">Nenhum banner adicionado ainda.</p>
+{% endif %}
+
+<h2 class="text-xl font-bold mt-8 mb-4">Banners Existentes</h2>
+<ul class="space-y-4">
+{% for h in hero_banners %}
+<li class="border p-4 rounded flex justify-between items-center">
+<div class="flex items-center space-x-4">
+{% if h['imagem'] %}<img src="{{ url_for('static', filename=h['imagem']) }}" class="h-24 w-36 object-cover rounded">{% endif %}
+<div>
+<h3 class="font-bold">{{ h['titulo'] }}</h3>
+<p>{{ h['descricao1'] }}</p>
+<p>{{ h['descricao2'] }}</p>
+</div>
+</div>
+<a href="{{ url_for('admin_hero_excluir', id=h['id']) }}" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700">Excluir</a>
+</li>
+{% endfor %}
+</ul>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+<script>
+var swiper = new Swiper(".mySwiperPreview", {
+  loop: true,
+  autoplay: { delay: 4000, disableOnInteraction: false },
+  navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+  pagination: { el: ".swiper-pagination", clickable: true },
+});
+</script>
+
+</body>
+</html>

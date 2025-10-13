@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Produtos</title>
+</head>
+<body class="p-6 bg-gray-50">
+<div class="max-w-7xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <a href="/admin/produtos/novo" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Novo Produto</a>
+    <form method="GET" class="flex items-center space-x-2">
+      <input type="text" name="q" placeholder="Pesquisar..." value="{{ q if q is defined else '' }}" class="border p-2 rounded" />
+      <select name="status" class="border p-2 rounded">
+        <option value="ativos" {% if status=='ativos' %}selected{% endif %}>Ativos</option>
+        <option value="inativos" {% if status=='inativos' %}selected{% endif %}>Inativos</option>
+        <option value="todos" {% if status=='todos' %}selected{% endif %}>Todos</option>
+      </select>
+      <button class="bg-blue-600 text-white py-2 px-3 rounded">Filtrar</button>
+    </form>
+  </div>
+
+  {% if produtos|length == 0 %}
+    <p class="text-gray-500">Nenhum produto encontrado.</p>
+  {% else %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {% for p in produtos %}
+        <div class="bg-white border rounded-lg overflow-hidden shadow-sm flex flex-col h-full">
+          <div class="relative">
+            {% if p['ativo'] == 0 %}
+              <div class="absolute top-2 left-2 bg-red-600 text-white text-xs py-1 px-2 rounded">Esgotado</div>
+            {% endif %}
+            {% if p.get('imagem') %}
+              {% if p.get('imagem_srcset') %}
+                <img srcset="{{ p['imagem_srcset'] }}" src="{{ url_for('static', filename=p['imagem']) }}" sizes="(max-width: 640px) 100vw, 33vw" class="h-40 w-full object-cover">
+              {% else %}
+                <img src="{{ url_for('static', filename=p['imagem']) }}" class="h-40 w-full object-cover">
+              {% endif %}
+            {% else %}
+              <div class="h-40 w-full bg-gray-100"></div>
+            {% endif %}
+          </div>
+          <div class="p-3 flex-1 flex flex-col">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-800">{{ p['nome'] }}</h3>
+              <p class="text-sm text-gray-600 mt-1">{{ p['descricao'] }}</p>
+            </div>
+            <div class="mt-3 flex items-center justify-between">
+              <div class="text-lg font-bold text-gray-900">R$ {{ p['preco'] }}</div>
+              <div class="flex items-center space-x-2">
+                <a href="{{ url_for('admin_produto_editar', id=p['id']) }}" class="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700">Editar</a>
+                <a href="{{ url_for('admin_produto_excluir', id=p['id']) }}" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700">Excluir</a>
+                {% if p['ativo'] == 1 %}
+                  <a href="{{ url_for('admin_produto_toggle', id=p['id']) }}" class="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600">Desativar</a>
+                {% else %}
+                  <a href="{{ url_for('admin_produto_toggle', id=p['id']) }}" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Ativar</a>
+                {% endif %}
+              </div>
+            </div>
+            {% if p['class_id'] %}
+              <div class="text-xs text-gray-500 mt-2">Classe: {{ p['class_id'] }}</div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="mt-6">
+    <a href="{{ url_for('admin_dashboard') }}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400">Voltar ao Dashboard</a>
+  </div>
+</div>
+</body>
+</html>

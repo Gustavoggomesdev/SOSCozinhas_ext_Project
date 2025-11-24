@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-import sqlite3, os, json
-from werkzeug.utils import secure_filename
+import os
+import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 try:
     from PIL import Image
@@ -636,9 +636,42 @@ def admin_change_password():
         return redirect(url_for('admin_dashboard'))
     return render_template('admin_change_password.html')
 
+@app.route('/admin/setup_password', methods=['GET'])
+def admin_setup_password():
+    """
+    Rota temporária para definir/atualizar a senha do admin no servidor.
+    Uso:
+      https://SEU_SITE.onrender.com/admin/setup_password?secret=SEU_SECRET_KEY&pwd=NOVA_SENHA
+    Requer que SOSCOZINHAS_SECRET_KEY esteja configurada nas Environment Variables do Render.
+    REMOVA esta rota após uso.
+    """
+    secret = request.args.get('secret', '')
+    pwd = request.args.get('pwd', '')
+    if not secret or secret != os.getenv('SOSCOZINHAS_SECRET_KEY'):
+        return "Forbidden", 403
+    if not pwd:
+        return "Provide ?pwd=NOVASENHA", 400
+
+    db_path = os.path.join(os.path.dirname(__file__), 'database.db')
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    # garante que exista admin; atualiza se existir, insere se não existir
+    cur.execute("SELECT id FROM admin WHERE username=?", ('admin',))
+    row = cur.fetchone()
+    hashed = generate_password_hash(pwd)
+    if row:
+        cur.execute("UPDATE admin SET password=? WHERE username=?", (hashed, 'admin'))
+    else:
+        cur.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ('admin', hashed))
+    conn.commit()
+    conn.close()
+    return "Senha do admin atualizada", 200
+
+port = int(os.getenv('PORT', 5001))
+
 if __name__=='__main__':
     os.makedirs(UPLOAD_FOLDER_HERO, exist_ok=True)
     os.makedirs(UPLOAD_FOLDER_PROD, exist_ok=True)
     init_db()
     # production: debug=False; bind to 0.0.0.0 para aceitar conexões externas na porta 5001
-    app.run(host='0.0.0.0', port=5001, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)

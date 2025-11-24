@@ -1,0 +1,190 @@
+{% extends 'admin_base.html' %}
+{% block title %}Hero Admin{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+<style>
+  /* Preview container styling */
+  .preview-container {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .mySwiperPreview {
+    width: 100%;
+    max-width: 500px;
+    height: 200px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  .mySwiperPreview .swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .mySwiperPreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .preview-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    width: 90%;
+  }
+  
+  .preview-text h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .preview-text p {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.9;
+  }
+  
+  .swiper-button-next, .swiper-button-prev {
+    color: white;
+    background: rgba(0,0,0,0.5);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+  
+  .swiper-button-next::after, .swiper-button-prev::after {
+    font-size: 14px;
+  }
+  
+  .swiper-pagination-bullet {
+    background: white;
+    opacity: 0.6;
+  }
+  
+  .swiper-pagination-bullet-active {
+    opacity: 1;
+  }
+</style>
+
+<a href="{{ url_for('admin_dashboard') }}" class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400 mb-4 inline-block">Voltar ao Dashboard</a>
+
+<h2 class="text-xl font-bold mb-4">Adicionar Novo Banner</h2>
+<form method="POST" enctype="multipart/form-data" class="space-y-4 mb-8">
+  <input name="titulo" placeholder="Título (opcional)" class="border p-2 rounded w-full">
+  <input name="descricao1" placeholder="Descrição 1 (opcional)" class="border p-2 rounded w-full">
+  <input name="descricao2" placeholder="Descrição 2 (opcional)" class="border p-2 rounded w-full">
+  <div class="flex items-center space-x-4">
+    <label class="flex items-center space-x-2">
+      <input type="checkbox" name="show_overlay" checked /> 
+      <span>Mostrar overlay (texto)</span>
+    </label>
+    <label class="flex items-center space-x-2">
+      <input type="checkbox" name="show_button" checked /> 
+      <span>Mostrar botão</span>
+    </label>
+  </div>
+  <input type="file" name="imagem" class="border p-2 rounded w-full">
+  <button class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">Salvar Banner</button>
+</form>
+
+{% if hero_banners %}
+<div class="preview-container">
+  <h2 class="text-xl font-bold mb-4">Preview Carrossel</h2>
+  <div class="swiper mySwiperPreview">
+    <div class="swiper-wrapper">
+      {% for h in hero_banners %}
+      <div class="swiper-slide">
+        {% if h['imagem'] %}
+          <img src="{{ url_for('static', filename=h['imagem']) }}" alt="Banner {{ loop.index }}">
+        {% endif %}
+        {% if h.get('show_overlay', 1) == 1 %}
+        <div class="preview-text">
+          {% if h.get('titulo') %}<h3>{{ h['titulo'] }}</h3>{% endif %}
+          {% if h.get('descricao1') %}<p>{{ h['descricao1'] }}</p>{% endif %}
+          {% if h.get('descricao2') %}<p>{{ h['descricao2'] }}</p>{% endif %}
+          {% if h.get('show_button', 1) == 1 %}
+            <div class="mt-2">
+              <span class="inline-block bg-blue-600 text-white py-1 px-3 rounded text-sm">Ver Produtos</span>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+</div>
+{% else %}
+<p class="text-gray-500">Nenhum banner adicionado ainda.</p>
+{% endif %}
+
+<h2 class="text-xl font-bold mt-8 mb-4">Banners Existentes</h2>
+<ul class="space-y-4">
+  {% for h in hero_banners %}
+  <li class="border p-4 rounded flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+      {% if h['imagem'] %}
+        <img src="{{ url_for('static', filename=h['imagem']) }}" class="h-24 w-36 object-cover rounded border">
+      {% endif %}
+      <div>
+        <h3 class="font-bold">{{ h['titulo'] or 'Sem título' }}</h3>
+        <p class="text-sm text-gray-600">{{ h['descricao1'] or 'Sem descrição 1' }}</p>
+        <p class="text-sm text-gray-600">{{ h['descricao2'] or 'Sem descrição 2' }}</p>
+        <div class="flex gap-4 mt-1 text-xs text-gray-500">
+          <span>Overlay: {{ 'Sim' if h.get('show_overlay', 1) == 1 else 'Não' }}</span>
+          <span>Botão: {{ 'Sim' if h.get('show_button', 1) == 1 else 'Não' }}</span>
+        </div>
+      </div>
+    </div>
+    <a href="{{ url_for('admin_hero_excluir', id=h['id']) }}" 
+       class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 text-sm"
+       onclick="return confirm('Tem certeza que deseja excluir este banner?')">
+      Excluir
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+<script>
+  var swiper = new Swiper(".mySwiperPreview", {
+    slidesPerView: 1,
+    loop: true,
+    autoplay: { 
+      delay: 3000, 
+      disableOnInteraction: false 
+    },
+    navigation: { 
+      nextEl: ".swiper-button-next", 
+      prevEl: ".swiper-button-prev" 
+    },
+    pagination: { 
+      el: ".swiper-pagination", 
+      clickable: true 
+    },
+    effect: 'fade',
+    fadeEffect: {
+      crossFade: true
+    }
+  });
+</script>
+
+{% endblock %}

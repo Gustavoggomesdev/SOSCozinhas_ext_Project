@@ -1,0 +1,5 @@
+Carrossel nas imagens do produto,
+poder abrir o produto para ver melhor
+corrigir width do produto quando mobile
+
+Talvez adicionar uma pesquisa de produtos

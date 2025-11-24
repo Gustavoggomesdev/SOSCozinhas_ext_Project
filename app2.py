@@ -667,7 +667,12 @@ def admin_setup_password():
     conn.close()
     return "Senha do admin atualizada", 200
 
-port = int(os.getenv('PORT', 5001))
+# garantir fallback seguro se PORT estiver vazia ou inválida
+port_env = os.getenv('PORT')
+try:
+    port = int(port_env) if port_env and port_env.strip() else 5001
+except ValueError:
+    port = 5001
 
 if __name__=='__main__':
     os.makedirs(UPLOAD_FOLDER_HERO, exist_ok=True)

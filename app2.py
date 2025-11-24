@@ -1,7 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-import os
-import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+import json
+import sqlite3
+from werkzeug.utils import secure_filename
+import logging
+
 try:
     from PIL import Image
 except Exception:
@@ -20,7 +24,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 import pathlib
 THEME = {
     'site_name': 'SOSCozinhas',
-    'logo': 'uploads/hero/copos.jfif',
+    'logo': 'uploads/hero/logo.png',
     'bg_color': '#f8fafc',
     'header_bg': '#ffffff',
     'header_text': '#0f172a',

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>{% block title %}Admin{% endblock %}</title>
+</head>
+<body class="flex bg-gray-100">
+<aside class="w-64 bg-white shadow h-screen p-4">
+  <h2 class="text-green-600 text-xl mb-4 font-bold">Painel Admin</h2>
+  <a href="/admin/produtos" class="block p-2 hover:bg-gray-200 rounded">Produtos</a>
+  <a href="/admin/hero" class="block p-2 hover:bg-gray-200 rounded">Hero</a>
+  <a href="/admin/classes" class="block p-2 hover:bg-gray-200 rounded">Classes</a>
+  <a href="/admin/contato" class="block p-2 hover:bg-gray-200 rounded">Contato</a>
+  <a href="/admin/faq" class="block p-2 hover:bg-gray-200 rounded">Dúvidas</a>
+  <a href="/admin/change_password" class="block p-2 hover:bg-gray-200 rounded">Alterar senha</a>
+  <a href="/admin/theme" class="block p-2 hover:bg-gray-200 rounded">Alterar Tema</a>
+  <a href="/" class="block p-2 mt-4 text-red-600 hover:bg-gray-200 rounded">Sair</a>
+</aside>
+<main class="flex-1 p-8">
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

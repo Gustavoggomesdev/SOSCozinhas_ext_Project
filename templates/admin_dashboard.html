@@ -1,0 +1,62 @@
+{% extends 'admin_base.html' %}
+{% block title %}Dashboard Admin{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Bem-vindo ao Painel Admin</h1>
+
+<!-- Cards de métricas -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+	<div class="bg-white p-4 rounded shadow">
+		<div class="text-sm text-gray-500">Produtos (total)</div>
+		<div class="text-2xl font-bold">{{ total_produtos }}</div>
+		<div class="text-sm text-green-600">Ativos: {{ total_produtos_ativos }}</div>
+	</div>
+	<div class="bg-white p-4 rounded shadow">
+		<div class="text-sm text-gray-500">Hero banners</div>
+		<div class="text-2xl font-bold">{{ total_banners }}</div>
+	</div>
+	<div class="bg-white p-4 rounded shadow">
+		<div class="text-sm text-gray-500">Contato (WhatsApp)</div>
+		<div class="text-lg">{{ contato['whatsapp'] if contato else '—' }}</div>
+	</div>
+</div>
+
+<!-- Últimos produtos -->
+<section class="mb-6">
+	<h2 class="text-lg font-semibold mb-3">Últimos produtos</h2>
+	<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+		{% for p in ultimos_produtos %}
+		<div class="bg-white p-3 rounded shadow flex flex-col">
+			{% if p['imagem'] %}
+			<img src="{{ url_for('static', filename=p['imagem']) }}" class="h-28 w-full object-cover rounded mb-2">
+			{% else %}
+			<div class="h-28 w-full bg-gray-100 rounded mb-2"></div>
+			{% endif %}
+			<div class="font-semibold">{{ p['nome'] }}</div>
+			<div class="text-sm text-gray-600">R$ {{ format_price(p['preco']) }}</div>
+			<a href="{{ url_for('admin_produto_editar', id=p['id']) }}" class="mt-2 text-sm text-blue-600">Editar</a>
+		</div>
+		{% endfor %}
+	</div>
+</section>
+
+<!-- Últimos banners -->
+<section>
+	<h2 class="text-lg font-semibold mb-3">Últimos banners</h2>
+	<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+		{% for b in ultimos_banners %}
+		<div class="bg-white p-3 rounded shadow flex items-center space-x-3">
+			{% if b['imagem'] %}
+			<img src="{{ url_for('static', filename=b['imagem']) }}" class="h-20 w-32 object-cover rounded">
+			{% else %}
+			<div class="h-20 w-32 bg-gray-100 rounded"></div>
+			{% endif %}
+			<div>
+				<div class="font-semibold">{{ b['titulo'] }}</div>
+				<a href="{{ url_for('admin_hero_excluir', id=b['id']) }}" class="text-sm text-red-600">Excluir</a>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</section>
+
+{% endblock %}

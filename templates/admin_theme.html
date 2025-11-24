@@ -1,0 +1,45 @@
+{% extends 'admin_base.html' %}
+{% block title %}Editar Tema{% endblock %}
+{% block content %}
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Editar Tema</h1>
+    <form method="POST">
+      <div class="grid grid-cols-1 gap-4">
+        <label>Nome do site
+          <input name="site_name" value="{{ theme.site_name }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Logo (caminho relativo em static/)
+          <input name="logo" value="{{ theme.logo }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor de fundo
+          <input name="bg_color" value="{{ theme.bg_color }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor cabeçalho
+          <input name="header_bg" value="{{ theme.header_bg }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor texto cabeçalho
+          <input name="header_text" value="{{ theme.header_text }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor primaria
+          <input name="primary" value="{{ theme.primary }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor texto primaria
+          <input name="primary_text" value="{{ theme.primary_text }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor rodapé
+          <input name="footer_bg" value="{{ theme.footer_bg }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Cor texto rodapé
+          <input name="footer_text" value="{{ theme.footer_text }}" class="border p-2 rounded w-full" />
+        </label>
+        <label>Raio dos botões (ex: 0.375rem)
+          <input name="button_radius" value="{{ theme.button_radius }}" class="border p-2 rounded w-full" />
+        </label>
+      </div>
+      <div class="mt-4">
+        <button class="bg-blue-600 text-white py-2 px-4 rounded">Salvar</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="ml-2 text-gray-700">Voltar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

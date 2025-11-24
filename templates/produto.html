@@ -1,0 +1,77 @@
+{% extends 'admin_base.html' %}
+{% block title %}{{ produto.nome }}{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4">
+  <nav class="text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
+    <a href="{{ url_for('index') }}" class="hover:underline">Início</a>
+    <span class="mx-2">/</span>
+    {% if produto.class_id %}
+      <a href="{{ url_for('index', class_id=produto.class_id) }}" class="hover:underline">Categoria</a>
+      <span class="mx-2">/</span>
+    {% endif %}
+    <span class="text-gray-700">{{ produto.nome }}</span>
+  </nav>
+
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+      <!-- Gallery (single image only) -->
+      <div class="md:col-span-1">
+        <div class="bg-gray-50 rounded-lg p-3">
+          <div class="relative">
+            {% if produto.imagem_srcset %}
+              <img id="mainImage" src="{{ url_for('static', filename=produto.imagem) }}" srcset="{{ produto.imagem_srcset }}" sizes="(max-width: 768px) 100vw, 33vw"
+                   alt="{{ produto.nome }}" class="w-full h-auto object-cover rounded">
+            {% else %}
+              <img id="mainImage" src="{{ url_for('static', filename=produto.imagem) }}" alt="{{ produto.nome }}" class="w-full h-auto object-cover rounded">
+            {% endif %}
+          </div>
+          <!-- thumbs/variants removed -->
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="md:col-span-2">
+        <div class="flex flex-col h-full">
+          <div class="flex items-start justify-between">
+            <div>
+              <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900">{{ produto.nome }}</h1>
+              {% if produto.descricao %}
+                <p class="mt-2 text-gray-600 max-w-3xl">{{ produto.descricao }}</p>
+              {% endif %}
+            </div>
+            <div class="text-right">
+              <div class="text-xl md:text-2xl font-semibold text-green-600">{{ format_price(produto.preco) }}</div>
+              <div class="text-sm text-gray-500">Preço à vista</div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+            <!-- Comprar removido (apenas admin verá esta página) -->
+            <a href="{{ url_for('index') }}" class="inline-flex items-center px-4 py-3 border rounded-md text-sm text-gray-700 hover:bg-gray-50">
+              Voltar à loja
+            </a>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-sm font-semibold text-gray-700">Descrição completa</h3>
+            <div class="mt-2 text-gray-700 prose max-w-none">
+              {{ produto.descricao }}
+            </div>
+          </div>
+
+          <!-- Compartilhar removido -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky mobile buy bar removed -->
+
+<script>
+(function(){
+  // thumbnail click removed (no thumbs)
+  // keep sticky check removed
+})();
+</script>
+{% endblock %}

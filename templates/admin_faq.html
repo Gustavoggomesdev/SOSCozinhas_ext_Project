@@ -1,0 +1,24 @@
+{% extends 'admin_base.html' %}
+{% block title %}Admin FAQ{% endblock %}
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Gerenciar Dúvidas</h1>
+  <form method="POST" class="space-y-3 mb-6">
+    <input name="pergunta" placeholder="Pergunta" class="border p-2 rounded w-full" />
+    <textarea name="resposta" placeholder="Resposta" class="border p-2 rounded w-full" rows="4"></textarea>
+    <button class="bg-green-600 text-white py-2 px-4 rounded">Adicionar</button>
+  </form>
+  <h2 class="text-xl font-semibold mb-3">Dúvidas cadastradas</h2>
+  <ul class="space-y-3">
+    {% for f in faqs %}
+      <li class="border p-3 rounded flex justify-between items-start">
+        <div>
+          <div class="font-semibold">{{ f['pergunta'] }}</div>
+          <div class="text-sm text-gray-700">{{ f['resposta'] }}</div>
+        </div>
+        <div>
+          <a href="{{ url_for('admin_faq_excluir', id=f['id']) }}" class="bg-red-600 text-white py-1 px-3 rounded">Excluir</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

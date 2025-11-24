@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import json
 import sqlite3
 from werkzeug.utils import secure_filename
 import logging
+from urllib.parse import quote_plus
 
 try:
     from PIL import Image
@@ -12,6 +13,8 @@ except Exception:
     Image = None
 
 app = Flask(__name__)
+# permitir usar json (e quote_plus se quiser) dentro dos templates
+app.jinja_env.globals.update(json=json, quote_plus=quote_plus)
 # use environment variable for secret key (fallback for dev)
 app.secret_key = os.getenv('SOSCOZINHAS_SECRET_KEY', 'chave-secreta-alterar')
 # session cookie hardening
@@ -24,7 +27,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 import pathlib
 THEME = {
     'site_name': 'SOSCozinhas',
-    'logo': 'uploads/hero/logo.png',
+    'logo': 'uploads/logo.png',
     'bg_color': '#f8fafc',
     'header_bg': '#ffffff',
     'header_text': '#0f172a',
@@ -60,9 +63,21 @@ def format_price(value):
         return value
 
 
+def build_whatsapp_url(phone, product_name, product_id):
+    if not phone:
+        return '#'
+    phone_digits = ''.join(c for c in str(phone) if c.isdigit())
+    try:
+        product_url = url_for('product_detail', id=product_id, _external=True)
+    except Exception:
+        product_url = url_for('index', _external=True) + f"#product-{product_id}"
+    msg = f"Olá, vim do site e gostaria de saber mais sobre o produto {product_name}. Link: {product_url}"
+    return f"https://api.whatsapp.com/send?phone={phone_digits}&text={quote_plus(msg)}"
+
 @app.context_processor
 def inject_helpers():
-    return dict(format_price=format_price)
+    # format_price deve existir no seu código; mantém a função disponível nos templates
+    return dict(format_price=format_price, whatsapp_link=build_whatsapp_url)
 
 UPLOAD_FOLDER_HERO = 'static/uploads/hero'
 UPLOAD_FOLDER_PROD = 'static/uploads/produtos'
@@ -252,6 +267,28 @@ def index():
     total_pages = (total + per_page - 1) // per_page
     return render_template('index.html', produtos=produtos, hero_banners=hero_banners, contato=contato, classes=classes,
                            page=page, per_page=per_page, total=total, total_pages=total_pages, class_id=class_id, sort=sort)
+
+# nova rota: detalhe do produto
+@app.route('/produto/<int:id>')
+def product_detail(id):
+    conn = get_db()
+    prod_row = conn.execute('SELECT * FROM produtos WHERE id=?',(id,)).fetchone()
+    if not prod_row:
+        conn.close()
+        abort(404)
+    produto = dict(prod_row)
+    # processar variantes se houver
+    if produto.get('imagem_variants'):
+        try:
+            variants = json.loads(produto['imagem_variants'])
+            produto['imagem_srcset'] = build_srcset_from_variants(variants)
+            produto['imagem'] = variants.get('1024') or variants.get('768') or list(variants.values())[0]
+        except Exception:
+            pass
+    contato_row = conn.execute('SELECT * FROM contato ORDER BY id DESC LIMIT 1').fetchone()
+    contato = dict(contato_row) if contato_row else None
+    conn.close()
+    return render_template('produto.html', produto=produto, contato=contato)
 
 # ------------------ ROTAS ADMIN ------------------
 

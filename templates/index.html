@@ -171,8 +171,15 @@
             <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ p['descricao'] }}</p>
             <div class="mt-3 flex items-center justify-between">
               <div class="text-xl font-bold">R$ {{ format_price(p['preco']) }}</div>
-              {% if contato %}
-              <a href="https://wa.me/{{ contato['whatsapp'] }}" class="theme-btn py-2 px-3 rounded hover:opacity-90">Comprar</a>
+
+              {% if contato and contato.get('whatsapp') %}
+                <a href="{{ whatsapp_link(contato['whatsapp'], p['nome'], p['id']) }}"
+                   target="_blank" rel="noopener noreferrer"
+                   class="theme-btn py-2 px-3 rounded hover:opacity-90">
+                  Comprar
+                </a>
+              {% else %}
+                <a href="#" class="theme-btn py-2 px-3 rounded opacity-60 cursor-not-allowed" aria-disabled="true">Comprar</a>
               {% endif %}
             </div>
           </div>
